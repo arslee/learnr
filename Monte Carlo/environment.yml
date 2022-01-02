@@ -1,0 +1,13 @@
+channels:
+  - conda-forge
+dependencies:
+  - r-base=4.2
+  - r-tidyverse
+  - r-shiny
+  - r-learnr
+  - r-ggridges
+  - r-latex2exp
+  - r-pals
+  - r-rmarkdown
+  - r-ggthemes
+  - r-purrr
