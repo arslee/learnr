@@ -1,0 +1,111 @@
+`list`: store any type of objects in any dimensions unlike `c`.
+
+```{r list, exercise = TRUE}
+
+mylist <- list(
+  "function" = function(x) {x + 1},
+  "character" = letters[1:2],
+  "integer" = 1L:2L,
+  "matrix" = matrix(1:4, nrow = 2, byrow = T)
+)
+
+mylist
+```
+
+You can subset and use `list` in multiple ways.
+
+```{r mylist, context='data',echo=F}
+
+mylist <- list(
+  "function" = function(x) {x + 1},
+  "character" = letters[1:2],
+  "integer" = 1L:2L,
+  "matrix" = matrix(1:4, nrow = 2, byrow = T)
+)
+
+```
+
+```{r list2, exercise = TRUE}
+#--- subset by position ---#
+mylist[[1]]
+
+#--- subset by name ---#
+mylist[c("function","integer")]
+
+
+#--- call "function" by name and pass an input to the function ---#
+mylist[["function"]](100) 
+
+
+#--- call "matrix" by position and extract (2,2) element in the matrix ---#
+mylist[[4]][2,2] 
+```
+
+
+`expand.grid`: Construct all possible combinations
+```{r, context='data', echo=F}
+param <- expand.grid(x = 1:2, 
+                     y = letters[1:2])
+
+```
+
+
+```{r param, exercise=T}
+param <- expand.grid(x = 1:2, 
+                     y = letters[1:2])
+param
+```
+
+
+`map`: Apply a list of inputs (one dimension) to a function
+```{r map, exercise=T}
+add_one <- function(input){input+1}
+map(param$x, add_one)
+```
+
+Note that it returns output as a list. You can specify the type of output.
+
+```{r map2, exercise=T}
+add_one <- function(input){input+1}
+map_chr(param$x, add_one)
+```
+
+
+`pmap`: Apply a list of inputs (multiple dimensions) to a function
+
+```{r pmap, exercise=T}
+bind <- function(input1,input2){paste0(input1,input2)}
+pmap(list(param$x,param$y), bind)
+```
+
+
+You can return multiple outputs in each iteration and combine the results in a data frame.
+
+```{r pmap2, exercise=T}
+bind <- function(input1, input2) {
+  list(
+    output1 = paste0(input1, input2),
+    output2 = paste0(input2, input1)
+  )
+}
+
+pmap(list(param$x, param$y), bind) %>%
+  bind_rows()
+```
+
+If the names of inputs and functions are identical, you can simplify your code. 
+
+```{r pmap3, exercise=T}
+
+bind <- function(x, y) {
+  list(
+    output1 = paste0(x, x),
+    output2 = paste0(y, x)
+  )
+}
+
+pmap(param, bind) %>%
+  bind_rows()
+
+
+```

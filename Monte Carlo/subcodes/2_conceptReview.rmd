@@ -1,0 +1,25 @@
+Consider the following DGP:
+$$y_{i}=\beta_{1}x_{1i}+\beta_{2}x_{2i} +\epsilon_{i}, $$ where $E[x_i\epsilon_i]=0.$
+Suppose you estimate the model using OLS but omitting $x_{2i}$:
+$$y_{i}=\alpha_{1}x_{1i}+e_{i} $$
+
+Then,
+$$
+\begin{align}
+\alpha_{1}&=\frac{cov(x_{1i},y_i)}{var(x_{1i})}\\
+&=\beta_1+\beta_2\frac{cov(x_{1i},x_{2i})}{var(x_{1i})}+ \overbrace{\frac{cov(x_{1i},\epsilon_{i})}{var(x_{1i})}}^{=0}\\
+&=\beta_{1}+\beta_2 \gamma,\\
+\end{align}
+$$
+
+where $\gamma$ is from $x_{2i}=\gamma x_{1i}+\eta_{i}.$
+
+As the equation suggests, omitted variable bias arises if 
+
+  - $\beta_{2}\neq 0$: the omitted variable is correlated with the dependent variable **AND**
+  - $\gamma\neq 0$: the omitted variable is correlated with your right hand side variable in your regression.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+

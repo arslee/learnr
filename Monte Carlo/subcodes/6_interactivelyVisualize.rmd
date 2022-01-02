@@ -1,0 +1,32 @@
+
+
+```{r, context="render", echo=FALSE}
+sliderInput("b2", withMathJax("$$\\text{Choose } \\beta_{2}$$"), min=0,max=1,value=0,step=.1,animate = animationOptions(interval = 2000))
+plotOutput("distPlot", height=500)
+
+```
+
+
+```{r, context="server"}
+
+output$distPlot <- renderPlot({
+
+readRDS("data/sim_out_1000.rds") %>% 
+  filter(b2 == as.character(input$b2)) %>% 
+  ggplot(aes(x=alpha,y=factor(gamma), fill=factor(gamma)))+
+  geom_density_ridges_gradient(quantile_lines = TRUE, quantiles = 2,scale = 3, rel_min_height = 0.01) +
+  scale_fill_manual(values = alpha(brewer.oranges(11),.8))+
+  labs(x= TeX('$\\hat{\\alpha}_{1}$'),y= TeX('$\\gamma$'))+
+  theme_classic()+
+  theme(legend.position = "none", 
+        axis.title.x = element_text(size=20),
+        axis.title.y = element_text(size=20),
+        axis.text.x = element_text(size=15),
+        axis.text.y = element_text(size=15),
+        strip.text =   element_text(size=20)
+        )+
+  xlim(.5,2.5)+
+  facet_wrap(~dist_sim)
+
+})
+```

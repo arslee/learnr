@@ -1,0 +1,9 @@
+Monte Carlo simulations are useful for understanding estimator properties (e.g., unbiasedness, consistency). In general, they consist of the following steps. 
+
+- Step 1: assume a known data generating process (DGP), e.g., $y_{i}=\beta X_{i}+e_{i}$
+- Step 2: generate a random sample of size $n$ from the DGP.
+- Step 3: compute desired statistics (e.g., mean, sd, beta) and save them.
+- Step 4: redo steps 2-3 many times.
+- Step 5: look at the distribution of saved statistics across iterations.
+
+In the following, we will learn how to run Monte Carlo simulations using R with an example of omitted variable bias.

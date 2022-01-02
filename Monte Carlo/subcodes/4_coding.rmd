@@ -1,0 +1,156 @@
+We will generate data of the form:
+$$y_{i}=\beta_{1}x_{1i}+\beta_{2}x_{2i} +\epsilon_{i},$$ where $x_{2i}=\gamma x_{1i}+\eta_{i}$, $x_{1i} \sim N(0,1)$ and $\eta_{i} \sim N(\sqrt{1-{\gamma}^2},1)$ for $i\in\{1,2,...,100\}$. 
+
+For each simulation, we will estimate $\alpha_1$ from 
+$$y_{i}=\alpha_{1}x_{1i} +e_{i},$$
+
+We will consider all the following possible combinations of DGP:
+
+-  $\epsilon_{i}: N(0,1)$ and student-$t$ distribution with $df=5$,
+-  $\gamma \in\{0,.5,1\}$,
+-  $\beta_{2} \in\{0,.5,1\}$
+
+For each combination of DGP (2 x 3 x 3 = 12), we will do 200 simulations.
+
+
+
+
+```{r coding, context='data', include=F}
+library(tidyverse)
+library(purrr)
+
+#--- set seed ---#
+set.seed(2021) 
+
+#--- number of repetitions ---# 
+num_reps <- 200
+
+#--- sim func ---#
+sim_func <- function(rep, n, gamma, b1, b2, dist_sim) {
+  #--- DGP ---#
+  df <- tibble(
+    x1 = rnorm(n = n, 0, 1),
+    x2 = gamma * x1 +  rnorm(n = n, sqrt(1 - gamma^2), 1),
+    err = dist_list[[dist_sim]](n),
+    Y = b1 * x1 + b2 * x2 + err
+  )
+  #--- estimate ---#
+  reg <- lm(Y ~ 0+x1, data = df) # ignore intercept
+  
+  #--- store results of interest (potentially many) ---#
+  results <- list(alpha = coefficients(reg)[1]) # put results in a list
+  return(results)
+}
+
+#--- param list ---#
+param_list <- expand.grid(
+  rep = 1:num_reps,
+  n = 100, 
+  gamma = c(0, 0.5, 1),
+  b1 = 1, 
+  b2 = c(0, 0.5, 1), 
+  dist_sim = c("Normal", "Student_t")
+)
+
+#--- dist list ---#
+dist_list <- list(
+  Normal = function(n) rnorm(n, 0, 1),
+  Student_t = function(n) rt(n, 5)
+)
+
+#--- loop ---#
+sim_out <-
+  param_list %>%
+  mutate(results = pmap(param_list, sim_func)) %>%
+  unnest_wider(results) %>%  # this is useful if we stored multiple outputs
+  group_by(gamma, b2) %>%
+  mutate(mean_alpha = mean(alpha))
+
+```
+
+
+
+Let's start by setting things up.
+
+```{r coding-setup, exercise=T}
+#--- load packages ---#
+library(tidyverse)
+library(purrr)
+
+#--- set seed ---#
+set.seed(2021) 
+
+#--- number of repetitions ---# 
+num_reps <- 200
+```
+
+
+
+We first create a function that 1) randomly draw $n$ samples from DGP and 2) estimate $\alpha_1$. 
+
+```{r coding-sim_func, exercise=T}
+sim_func <- function(rep, n, gamma, b1, b2, dist_sim) {
+  #--- DGP ---#
+  df <- tibble(
+    x1 = rnorm(n = n, 0, 1),
+    x2 = gamma * x1 + sqrt(1 - gamma^2) * rnorm(n = n, 0, 1),
+    err = dist_list[[dist_sim]](n),
+    Y = b1 * x1 + b2 * x2 + err
+  )
+  
+  #--- estimate alpha ---#
+  reg <- lm(Y ~ 0+x1, data = df) # ignore intercept
+  
+  #--- store results of interest (potentially many) ---#
+  results <- list(alpha = coefficients(reg)[1]) # put results in a list
+  return(results)
+}
+
+```
+
+We then specify all possible combinations of parameters. 
+```{r param_list, exercise=T}
+param_list <- expand.grid(
+  rep = 1:num_reps,
+  n = 100, 
+  gamma = c(0, 0.5, 0.9),
+  b1 = 1, 
+  b2 = c(0, 0.5, 1), 
+  dist_sim = c("Normal", "Student_t")
+)
+
+dim(param_list)
+```
+
+
+We then specify what `Normal` and `Student_t` means. 
+```{r dist_list, exercise=T}
+dist_list <- list(
+  Normal = function(n) rnorm(n, 0, 1),
+  Student_t = function(n) rt(n, 5)
+)
+```
+
+
+Before we generalize, let's run a few.
+```{r sample, exercise=T}
+param_123 <- param_list[1:3,]
+pmap(param_123, sim_func) %>%
+  bind_rows()
+
+
+```
+
+It looks good. Now, let's combine our parameters and results.
+
+```{r sim_out, exercise=T}
+sim_out <-
+  param_list %>%
+  mutate(results = pmap(param_list, sim_func)) %>%
+  unnest_wider(results) %>%  # this is useful if we stored multiple outputs
+  group_by(gamma, b2) %>%
+  mutate(mean_alpha = mean(alpha))
+
+sim_out %>% head()
+```
+

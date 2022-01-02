@@ -1,0 +1,25 @@
+Recall that omitted variable bias arises if 
+
+- $\beta_{2}\neq 0$: the omitted variable is correlated with the dependent variable **AND**
+- $\gamma\neq 0$: the omitted variable is correlated with your right hand side variable.
+
+Do you see the lesson in the figure? 
+
+```{r sim_out1, context='data', include=F}
+
+sim_out <- readRDS("../data/sim_out_100.rds")
+```
+
+```{r visualize, exercise=T}
+  sim_out %>%
+  mutate(gamma = paste0("gamma = ", gamma)) %>%
+  ggplot(aes(x = b2)) +
+  geom_jitter(aes(y = alpha, color = dist_sim),
+    position = position_jitterdodge(jitter.width = .1, dodge.width = .2),
+    alpha = .4
+  ) +
+  geom_point(aes(y = mean_alpha, shape = dist_sim), position = position_dodge(width = .2), size = 2) +
+  labs(x = TeX("$\\beta_2$"), y = TeX("$\\hat{\\alpha}_{1}$")) +
+  facet_wrap(vars(gamma)) +
+  theme_classic()
+```

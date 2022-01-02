@@ -1,0 +1,64 @@
+---
+title: "Introduction to Simulations"
+output:
+  learnr::tutorial:
+runtime: shiny_prerendered
+---
+
+
+```{r, include=FALSE}
+library(latex2exp)
+library(shiny)
+library(learnr)
+library(tidyverse)
+library(ggthemes)
+library(pals)
+library(ggridges)
+
+knitr::opts_chunk$set(echo = T)
+set.seed(2020)
+
+## number of repetitions
+num_reps <- 200
+```
+
+
+```{r, child='subcodes/0_style.rmd'}
+```
+
+
+## Overview
+
+```{r, child='subcodes/1_overview.rmd'}
+```
+
+
+## Concept Review
+
+```{r, child='subcodes/2_conceptReview.rmd'}
+```
+
+## R tricks
+
+```{r, child='subcodes/3_Rtricks.rmd'}
+```
+
+
+## Coding
+
+```{r, child='subcodes/4_coding.rmd'}
+```
+
+
+## Visualize results
+
+```{r, child='subcodes/5_visualize.rmd'}
+```
+
+
+## Interactively visualize results
+
+```{r, child='subcodes/6_interactivelyVisualize.rmd'}
+```
+
+
